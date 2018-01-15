@@ -6,6 +6,8 @@ services:
   - docker
 script:
   - set -e
+  - TDATE=$(date '+%Y-%m-%d %H:%M:%S')
+  - echo "Date and time $TDATE"
   - mvn clean verify
   - export TAG=$(if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else if [ -n "$TRAVIS_PULL_REQUEST_BRANCH" ]; then echo ${TRAVIS_PULL_REQUEST_BRANCH//\//_}; else echo ${TRAVIS_BRANCH//\//_}; fi fi)
   - echo "Docker Image Tag $TAG."
@@ -17,7 +19,7 @@ after_success:
   - set -e
   - docker login -u $DOCKER_USER -p $DOCKER_PASS
   - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "feature/build-infrastructure" ]]; then
-       docker tag $REPO:$TAG $REPO:$TRAVIS_BUILD_NUMBER;
-       docker push $REPO:$TRAVIS_BUILD_NUMBER;
+       docker tag $REPO:$TAG $REPO:TDATE;
+       docker push $REPO:$TDATE;
     fi 
   - docker push $REPO:$TAG
