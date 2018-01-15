@@ -6,7 +6,8 @@ services:
   - docker
 script:
   - mvn clean verify
-  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else if [ -n "$1" ]; then echo $TRAVIS_PULL_REQUEST_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi fi`
+  - echo "Docker Image Tag: $TAG."
   - export REPO=jmaslibre/performance-data-collection
   - docker build -t $REPO:$TAG -f Dockerfile .
   - echo "Testing the image"
