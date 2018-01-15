@@ -1,5 +1,20 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: false
-script: mvn clean verify
+sudo: required
+services:
+  - docker
+script:
+  - mvn clean verify
+  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+  - export REPO=jmaslibre/performance-data-collection
+  - docker build -t $REPO:$TAG -f Dockerfile .
+  - echo "Testing the image"
+  - docker run $REPO:$TAG
+after_success:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASS
+  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "feature/build-infrastructure" ]]; then
+       docker tag $REPO:$TAG $REPO:$TRAVIS_BUILD_NUMBER;
+       docker push $REPO:$TRAVIS_BUILD_NUMBER;
+    fi 
+  - docker push $REPO:$TAG
