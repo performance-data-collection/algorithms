@@ -6,7 +6,7 @@ services:
   - docker
 script:
   - set -e
-  - TDATE=$(date '+%Y-%m-%d %H:%M:%S')
+  - TDATE=$(date '+%Y%m%d%H%M%S')
   - echo "Date and time $TDATE"
   - mvn clean verify
   - export TAG=$(if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else if [ -n "$TRAVIS_PULL_REQUEST_BRANCH" ]; then echo ${TRAVIS_PULL_REQUEST_BRANCH//\//_}; else echo ${TRAVIS_BRANCH//\//_}; fi fi)
